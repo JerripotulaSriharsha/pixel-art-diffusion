@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 
 """
-Script to cut sprites from spritesheets. Detects background color and also rescales the sprites to 512x512 and 1024x1024.
+Script to cut sprites from spritesheets. Detects background color, also rescales the sprites to 512x512 and 1024x1024.
 """
 
 
