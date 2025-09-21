@@ -13,3 +13,7 @@ wheels/
 *.env
 
 data/cleaned_sprites_good
+
+training/wandb
+output/
+models/*
