@@ -1,0 +1,1 @@
+monster,  green, large, standing, front view, open mouth, teeth.

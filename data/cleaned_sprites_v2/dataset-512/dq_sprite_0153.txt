@@ -1,0 +1,4 @@
+demon, green skin, sitting, brown gloves, silver belt, silver pants, standing pose, facing front. 
+
+Alternatively, a more concise version: 
+demon, green skin, sitting, brown gloves, silver belt, silver pants.

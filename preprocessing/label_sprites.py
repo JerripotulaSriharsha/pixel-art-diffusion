@@ -22,6 +22,22 @@ def before_sleep_print(retry_state):
     print(f"Timeout hit, retrying in {retry_state.next_action.sleep} seconds...")
 
 
+prompt = """
+You are helping prepare training captions for a LoRA model.  
+
+Your task is to create short, consistent captions for each image.  
+Rules:  
+- Do NOT mention the unique style (that it's pixel art).
+- Do NOT mention the magenta background color as this will be removed later.
+- Don't say 'creature' but try to identify the subject (even if it is mytical)
+- DO mention clothes, background, objects, pose, and anything that should be variable later.  
+- Use 3–8 keywords separated by commas.  
+- Do not write full sentences.  
+- Keep the wording consistent across images.  
+
+"""
+
+
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_fixed(60),
@@ -37,7 +53,7 @@ def groq_llm_call(image_path):
                 "content": [
                     {
                         "type": "text",
-                        "text": "You are an expert prompt engineer for text-to-image pixel artdiffusion models (e.g. Stable Diffusion). Concisely describe this image into 2-3 sentences. Don't mention the style. Don't say 'the image shows' or 'the image is of', just describe the image. Don't mention the background.",
+                        "text": prompt,
                     },
                     {
                         "type": "image_url",
@@ -48,7 +64,8 @@ def groq_llm_call(image_path):
                 ],
             },
         ],
-        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        # model="meta-llama/llama-4-scout-17b-16e-instruct",
+        model="meta-llama/llama-4-maverick-17b-128e-instruct",
     )
     return chat_completion.choices[0].message.content
 
@@ -61,7 +78,7 @@ def save_label(txt_path, label):
 
 def process_sprites():
     """Process all sprites in dataset-512 and save labels to both datasets."""
-    base_dir = Path(__file__).parent.parent / "data" / "cleaned_sprites_good"
+    base_dir = Path(__file__).parent.parent / "data" / "cleaned_sprites_v2"
     dataset_512_dir = base_dir / "dataset-512"
     dataset_1024_dir = base_dir / "dataset-1024"
 

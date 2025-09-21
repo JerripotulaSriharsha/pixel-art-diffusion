@@ -1,0 +1,1 @@
+minotaur, armor, axe, standing, full body, facing front.
