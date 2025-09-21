@@ -5,6 +5,10 @@ from collections import Counter, deque
 from PIL import Image
 import numpy as np
 
+"""
+Script to cut sprites from spritesheets. Detects background color and also rescales the sprites to 512x512 and 1024x1024.
+"""
+
 
 def detect_background_color(arr):
     """Pick the most likely background color using corners + sparse grid sample."""
@@ -248,7 +252,7 @@ def main():
     class Args:
         def __init__(self):
             self.input = "data/raw_spritesheets/"  # Input file or folder path
-            self.out = "data/cleaned_sprites2/"  # Output directory
+            self.out = "data/test"  # Output directory
             self.tol = 10.0  # Color distance tolerance vs. background
             self.min_size = 10  # Minimum bbox width/height
             self.min_area = 50  # Minimum bbox area
@@ -269,6 +273,11 @@ def main():
 
     inp = Path(args.input)
     out_base = Path(args.out)
+
+    # check if the output directory exists
+    if out_base.exists():
+        print(f"Error: {out_base} already exists")
+        raise ValueError(f"Output directory {out_base} already exists")
 
     if inp.is_dir():
         img_exts = tuple(e.strip().lower() for e in args.exts.split(","))
