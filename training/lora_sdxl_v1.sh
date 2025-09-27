@@ -2,7 +2,7 @@
 
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export VAE_NAME="madebyollin/sdxl-vae-fp16-fix"
-export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-1024"
+export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-1024-v2"
 
 accelerate launch train_text_to_image_lora_sdxl.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
@@ -14,5 +14,5 @@ accelerate launch train_text_to_image_lora_sdxl.py \
   --learning_rate=1e-04 --lr_scheduler="constant" --lr_warmup_steps=0 \
   --mixed_precision="fp16" \
   --seed=42 \
-  --output_dir="pixel-art-lora-sdxl" \
-  --validation_prompt="A large undead construct made of rusted iron and bones" --report_to="wandb" \
+  --output_dir="pixel-art-lora-sdxl-v3" \
+  --validation_prompt="undead, rusted iron, bones" --report_to="wandb" \
