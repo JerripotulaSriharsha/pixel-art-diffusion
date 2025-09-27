@@ -1,0 +1,1 @@
+warrior, armor, sword, shield, kneeling, dq_pookie

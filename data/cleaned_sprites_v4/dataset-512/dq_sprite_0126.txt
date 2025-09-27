@@ -1,0 +1,1 @@
+king, crown, cloak, staff, robe, jewelry, undead, zombie, dq_pookie

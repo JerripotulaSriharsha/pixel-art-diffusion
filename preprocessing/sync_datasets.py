@@ -1,8 +1,8 @@
 import os
 
 # Configuration variables
-DATASET_512_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_good/dataset-512"
-DATASET_1024_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_good/dataset-1024"
+DATASET_512_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_v4/dataset-512"
+DATASET_1024_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_v4/dataset-1024"
 
 
 def get_base_filenames(directory):
@@ -15,8 +15,8 @@ def get_base_filenames(directory):
     return base_names
 
 
-def sync_datasets():
-    """Remove files from 1024 dataset that don't exist in 512 dataset."""
+def sync_datasets(use_512_as_reference):
+    """Remove files from one dataset that don't exist in the reference dataset and sync text files."""
     # Get base filenames from both datasets
     dataset_512_files = get_base_filenames(DATASET_512_PATH)
     dataset_1024_files = get_base_filenames(DATASET_1024_PATH)
@@ -24,21 +24,35 @@ def sync_datasets():
     print(f"Files in 512 dataset: {len(dataset_512_files)}")
     print(f"Files in 1024 dataset: {len(dataset_1024_files)}")
 
-    # Find files in 1024 that are not in 512
-    files_to_remove = dataset_1024_files - dataset_512_files
+    # Determine which files to remove and from which dataset
+    if use_512_as_reference:
+        # Use 512 as truth, remove files from 1024 that don't exist in 512
+        files_to_remove = dataset_1024_files - dataset_512_files
+        target_path = DATASET_1024_PATH
+        target_name = "1024"
+        reference_path = DATASET_512_PATH
+        reference_name = "512"
+        common_files = dataset_512_files & dataset_1024_files
+    else:
+        # Use 1024 as truth, remove files from 512 that don't exist in 1024
+        files_to_remove = dataset_512_files - dataset_1024_files
+        target_path = DATASET_512_PATH
+        target_name = "512"
+        reference_path = DATASET_1024_PATH
+        reference_name = "1024"
+        common_files = dataset_512_files & dataset_1024_files
 
-    print(f"Files to remove from 1024 dataset: {len(files_to_remove)}")
+    print(f"Files to remove from {target_name} dataset: {len(files_to_remove)}")
+    print(
+        f"Text files to sync from {reference_name} to {target_name}: {len(common_files)}"
+    )
 
-    if not files_to_remove:
-        print("No files need to be removed. Datasets are already synchronized.")
-        return
-
-    # Remove files from 1024 dataset
+    # Remove files from target dataset
     removed_count = 0
     for base_name in files_to_remove:
         # Remove both .png and .txt files
         for ext in [".png", ".txt"]:
-            file_path = os.path.join(DATASET_1024_PATH, base_name + ext)
+            file_path = os.path.join(target_path, base_name + ext)
             if os.path.exists(file_path):
                 try:
                     os.remove(file_path)
@@ -47,15 +61,25 @@ def sync_datasets():
                 except OSError as e:
                     print(f"Error removing {file_path}: {e}")
 
+    # Sync text files from reference to target
+    synced_count = 0
+    for base_name in common_files:
+        reference_txt = os.path.join(reference_path, base_name + ".txt")
+        target_txt = os.path.join(target_path, base_name + ".txt")
+
+        if os.path.exists(reference_txt):
+            try:
+                import shutil
+
+                shutil.copy2(reference_txt, target_txt)
+                print(f"Synced text file: {base_name}.txt")
+                synced_count += 1
+            except OSError as e:
+                print(f"Error syncing {reference_txt} to {target_txt}: {e}")
+
     print(f"\nSynchronization complete!")
-    print(f"Removed {removed_count} files from {DATASET_1024_PATH}")
-
-    # Verify final counts
-    final_512_files = get_base_filenames(DATASET_512_PATH)
-    final_1024_files = get_base_filenames(DATASET_1024_PATH)
-
-    print(f"Final count - 512 dataset: {len(final_512_files)} files")
-    print(f"Final count - 1024 dataset: {len(final_1024_files)} files")
+    print(f"Removed {removed_count} files from {target_path}")
+    print(f"Synced {synced_count} text files from {reference_name} to {target_name}")
 
 
 def rename_files_in_directory(directory, sorted_base_names):
@@ -122,7 +146,7 @@ if __name__ == "__main__":
         exit(1)
 
     # First sync the datasets
-    sync_datasets()
+    sync_datasets(use_512_as_reference=False)
 
     # Then rename files in both datasets
     rename_datasets()

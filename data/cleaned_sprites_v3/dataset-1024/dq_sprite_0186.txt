@@ -1,0 +1,1 @@
+knight, armor, sword, standing, left hand on sword handle, right hand holding dagger, dq_pookie

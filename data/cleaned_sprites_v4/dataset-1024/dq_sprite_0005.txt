@@ -1,0 +1,1 @@
+knight, axe, shield, armor, dq_pookie
