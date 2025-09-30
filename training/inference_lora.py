@@ -3,18 +3,12 @@ import torch
 import time
 import os
 
-model_path = "models/pixel-art-lora-sdxl-v5/checkpoint-500"
-
-# Load VAE separately
-vae = AutoencoderKL.from_pretrained(
-    "madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16
-)
+model_path = "models/pixel-art-lora-v5"
 
 # Load pipeline and inject VAE
 pipe = DiffusionPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-base-1.0",
+    "stable-diffusion-v1-5/stable-diffusion-v1-5",
     torch_dtype=torch.float16,
-    vae=vae,  # pass the VAE object here
 )
 
 pipe.to("cuda")
@@ -23,7 +17,7 @@ pipe.to("cuda")
 pipe.load_lora_weights(model_path)
 
 # Generate
-prompt = "rat, dq_pookie"
+prompt = "undead, machine, dq_pookie"
 
 num_images = 8  # how many images you want
 os.makedirs("output", exist_ok=True)
@@ -38,6 +32,6 @@ images = pipe(
 
 timestamp = int(time.time())
 for i, img in enumerate(images):
-    filename = f"output/pixel-art-lora-sdxl-v5-{timestamp}-{i}.png"
+    filename = f"output/pixel-art-lora-v5-{timestamp}-{i}.png"
     img.save(filename)
     print(f"Saved {filename}")
