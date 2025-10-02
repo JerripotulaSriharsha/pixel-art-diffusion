@@ -1,1 +1,0 @@
-robot, armor, standing, open mouth, orange eyes, gloves, boots, full body

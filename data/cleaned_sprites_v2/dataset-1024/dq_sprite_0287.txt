@@ -1,1 +1,0 @@
-frog, hood, hammer, weapon, standing, full body.

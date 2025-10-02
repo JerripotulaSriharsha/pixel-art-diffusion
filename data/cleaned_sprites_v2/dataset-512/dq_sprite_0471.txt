@@ -1,1 +1,0 @@
-skeleton warrior, armor, cape, sword, standing, dynamic pose

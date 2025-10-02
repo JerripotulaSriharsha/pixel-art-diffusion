@@ -1,1 +1,0 @@
-dragon, armor, shield, flying, green, purple

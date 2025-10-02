@@ -1,0 +1,1 @@
+cape, robe, humanoid, dq_pookie

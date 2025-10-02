@@ -11,7 +11,7 @@ login(os.environ.get("HF_TOKEN"))
 
 api = HfApi()
 repo_url = api.create_repo(
-    repo_id="pixel-art-finetune-dataset-1024-v4",
+    repo_id="pixel-art-finetune-dataset-256-v4",
     repo_type="dataset",
     private=False,
 )
@@ -19,8 +19,8 @@ repo_url = api.create_repo(
 # wait for 10 seconds (until repo is created)
 time.sleep(10)
 upload_file(
-    path_or_fileobj="data/cleaned_sprites_v4/dataset-1024.parquet",
-    path_in_repo="data/dataset-1024.parquet",
-    repo_id="pookie3000/pixel-art-finetune-dataset-1024-v4",
+    path_or_fileobj="data/cleaned_sprites_v4/dataset-256.parquet",
+    path_in_repo="data/dataset-256.parquet",
+    repo_id="pookie3000/pixel-art-finetune-dataset-256-v4",
     repo_type="dataset",
 )

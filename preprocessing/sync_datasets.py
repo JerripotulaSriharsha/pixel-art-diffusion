@@ -1,8 +1,5 @@
 import os
-
-# Configuration variables
-DATASET_512_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_v4/dataset-512"
-DATASET_1024_PATH = "/Users/woutvossen/Documents/programming/pixel-art-finetune/data/cleaned_sprites_v4/dataset-1024"
+import argparse
 
 
 def get_base_filenames(directory):
@@ -15,37 +12,21 @@ def get_base_filenames(directory):
     return base_names
 
 
-def sync_datasets(use_512_as_reference):
-    """Remove files from one dataset that don't exist in the reference dataset and sync text files."""
+def sync_datasets(reference_path, target_path):
+    """Remove files from target dataset that don't exist in reference dataset and sync text files."""
     # Get base filenames from both datasets
-    dataset_512_files = get_base_filenames(DATASET_512_PATH)
-    dataset_1024_files = get_base_filenames(DATASET_1024_PATH)
+    reference_files = get_base_filenames(reference_path)
+    target_files = get_base_filenames(target_path)
 
-    print(f"Files in 512 dataset: {len(dataset_512_files)}")
-    print(f"Files in 1024 dataset: {len(dataset_1024_files)}")
+    print(f"Files in reference dataset: {len(reference_files)}")
+    print(f"Files in target dataset: {len(target_files)}")
 
-    # Determine which files to remove and from which dataset
-    if use_512_as_reference:
-        # Use 512 as truth, remove files from 1024 that don't exist in 512
-        files_to_remove = dataset_1024_files - dataset_512_files
-        target_path = DATASET_1024_PATH
-        target_name = "1024"
-        reference_path = DATASET_512_PATH
-        reference_name = "512"
-        common_files = dataset_512_files & dataset_1024_files
-    else:
-        # Use 1024 as truth, remove files from 512 that don't exist in 1024
-        files_to_remove = dataset_512_files - dataset_1024_files
-        target_path = DATASET_512_PATH
-        target_name = "512"
-        reference_path = DATASET_1024_PATH
-        reference_name = "1024"
-        common_files = dataset_512_files & dataset_1024_files
+    # Determine which files to remove from target
+    files_to_remove = target_files - reference_files
+    common_files = reference_files & target_files
 
-    print(f"Files to remove from {target_name} dataset: {len(files_to_remove)}")
-    print(
-        f"Text files to sync from {reference_name} to {target_name}: {len(common_files)}"
-    )
+    print(f"Files to remove from target dataset: {len(files_to_remove)}")
+    print(f"Text files to sync from reference to target: {len(common_files)}")
 
     # Remove files from target dataset
     removed_count = 0
@@ -79,7 +60,7 @@ def sync_datasets(use_512_as_reference):
 
     print(f"\nSynchronization complete!")
     print(f"Removed {removed_count} files from {target_path}")
-    print(f"Synced {synced_count} text files from {reference_name} to {target_name}")
+    print(f"Synced {synced_count} text files from reference to target")
 
 
 def rename_files_in_directory(directory, sorted_base_names):
@@ -106,17 +87,17 @@ def rename_files_in_directory(directory, sorted_base_names):
     print(f"Renamed {renamed_count} files in {directory}")
 
 
-def rename_datasets():
+def rename_datasets(reference_path, target_path):
     """Rename files in both datasets with consistent numbering."""
     print("\n" + "=" * 50)
     print("RENAMING PHASE")
     print("=" * 50)
 
-    # Get base filenames from 512 dataset (this is our reference)
-    dataset_512_files = get_base_filenames(DATASET_512_PATH)
+    # Get base filenames from reference dataset (this is our reference)
+    reference_files = get_base_filenames(reference_path)
 
     # Sort the filenames to ensure consistent ordering
-    sorted_base_names = sorted(list(dataset_512_files))
+    sorted_base_names = sorted(list(reference_files))
 
     print(f"Found {len(sorted_base_names)} unique sprites to rename")
     print(
@@ -124,29 +105,34 @@ def rename_datasets():
     )
 
     # Rename files in both directories
-    rename_files_in_directory(DATASET_512_PATH, sorted_base_names)
-    rename_files_in_directory(DATASET_1024_PATH, sorted_base_names)
+    rename_files_in_directory(reference_path, sorted_base_names)
+    rename_files_in_directory(target_path, sorted_base_names)
 
     print(f"\nRenaming complete! Both datasets now have consistent naming.")
 
 
 if __name__ == "__main__":
+    reference_path = "data/cleaned_sprites_v5/dataset-512"
+    target_path = "data/cleaned_sprites_v5/dataset-128"
+    no_rename = False
+
     print("Synchronizing datasets...")
-    print(f"Source (reference): {DATASET_512_PATH}")
-    print(f"Target (to be synced): {DATASET_1024_PATH}")
+    print(f"Reference (source of truth): {reference_path}")
+    print(f"Target (will be synced): {target_path}")
     print()
 
     # Verify directories exist
-    if not os.path.exists(DATASET_512_PATH):
-        print(f"Error: 512 dataset directory not found: {DATASET_512_PATH}")
+    if not os.path.exists(reference_path):
+        print(f"Error: Reference dataset directory not found: {reference_path}")
         exit(1)
 
-    if not os.path.exists(DATASET_1024_PATH):
-        print(f"Error: 1024 dataset directory not found: {DATASET_1024_PATH}")
+    if not os.path.exists(target_path):
+        print(f"Error: Target dataset directory not found: {target_path}")
         exit(1)
 
     # First sync the datasets
-    sync_datasets(use_512_as_reference=False)
+    sync_datasets(reference_path, target_path)
 
-    # Then rename files in both datasets
-    rename_datasets()
+    # Then rename files in both datasets (if not disabled)
+    if not no_rename:
+        rename_datasets(reference_path, target_path)

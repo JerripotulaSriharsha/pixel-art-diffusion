@@ -1,7 +1,7 @@
 from datasets import Dataset, Features, Value, Image
 import os
 
-DATASET_DIR = "data/cleaned_sprites_v4/dataset-1024/"
+DATASET_DIR = "data/cleaned_sprites_v4/dataset-256/"
 
 records = []
 file_names = os.listdir(DATASET_DIR)
@@ -28,4 +28,4 @@ features = Features(
 )
 
 ds = Dataset.from_list(records, features=features)
-ds.to_parquet("data/cleaned_sprites_v4/dataset-1024.parquet")
+ds.to_parquet("data/cleaned_sprites_v4/dataset-256.parquet")

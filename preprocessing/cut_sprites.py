@@ -146,9 +146,12 @@ def save_with_padding_constant_scale(
 
 def process_image(path: Path, out_base: Path, args):
     out_raw = out_base / "raw"
+    out_64 = out_base / "dataset-64"
+    out_128 = out_base / "dataset-128"
+    out_256 = out_base / "dataset-256"
     out_512 = out_base / "dataset-512"
     out_1024 = out_base / "dataset-1024"
-    for d in (out_raw, out_512, out_1024):
+    for d in (out_raw, out_64, out_128, out_256, out_512, out_1024):
         d.mkdir(parents=True, exist_ok=True)
 
     im = Image.open(path).convert("RGB")
@@ -222,6 +225,27 @@ def process_image(path: Path, out_base: Path, args):
         # Save constant-scale padded versions
         save_with_padding_constant_scale(
             crop,
+            out_64 / fn,
+            64,
+            canvas_bg,
+            getattr(args, "pad_px_64", 1),
+        )
+        save_with_padding_constant_scale(
+            crop,
+            out_128 / fn,
+            128,
+            canvas_bg,
+            getattr(args, "pad_px_128", 2),
+        )
+        save_with_padding_constant_scale(
+            crop,
+            out_256 / fn,
+            256,
+            canvas_bg,
+            getattr(args, "pad_px_256", 4),
+        )
+        save_with_padding_constant_scale(
+            crop,
             out_512 / fn,
             512,
             canvas_bg,
@@ -236,6 +260,15 @@ def process_image(path: Path, out_base: Path, args):
         )
 
         # caption stubs
+        (out_64 / fn.replace(".png", ".txt")).write_text(
+            "pixel art monster, retro SNES RPG style\n"
+        )
+        (out_128 / fn.replace(".png", ".txt")).write_text(
+            "pixel art monster, retro SNES RPG style\n"
+        )
+        (out_256 / fn.replace(".png", ".txt")).write_text(
+            "pixel art monster, retro SNES RPG style\n"
+        )
         (out_512 / fn.replace(".png", ".txt")).write_text(
             "pixel art monster, retro SNES RPG style\n"
         )
@@ -266,6 +299,9 @@ def main():
             self.new_bg_color = (255, 0, 255)  # New background color (R, G, B)
 
             # Final export padding (uniform border on the *output canvas*, in output pixels)
+            self.pad_px_64 = 1
+            self.pad_px_128 = 2
+            self.pad_px_256 = 4
             self.pad_px_512 = 8
             self.pad_px_1024 = 16
 

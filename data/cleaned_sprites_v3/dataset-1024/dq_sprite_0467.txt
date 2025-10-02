@@ -1,1 +1,0 @@
-robot, dynamic pose, grey body, blue eyes, red mouth, yellow claws, standing, facing forward, dq_pookie

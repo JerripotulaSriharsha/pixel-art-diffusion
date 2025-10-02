@@ -1,3 +1,0 @@
-demon, cloak, standing, cane, hat, blue hat, yellow hat, waving hand 
-
-Alternatively: demon, robe, standing, cane, hat, blue hat, yellow hat, waving hand, dq_pookie
