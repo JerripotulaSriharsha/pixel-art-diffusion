@@ -3,7 +3,7 @@ export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export VAE_NAME="madebyollin/sdxl-vae-fp16-fix"
 export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-1024-v2"
 
-accelerate launch train_text_to_image_lora_sdxl.py \
+accelerate launch ../train_text_to_image_lora_sdxl.py \
   --pretrained_model_name_or_path="$MODEL_NAME" \
   --pretrained_vae_model_name_or_path="$VAE_NAME" \
   --dataset_name="$DATASET_NAME" --caption_column="text" \

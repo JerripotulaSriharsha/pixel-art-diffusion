@@ -3,7 +3,7 @@
 export MODEL_NAME="stable-diffusion-v1-5/stable-diffusion-v1-5"
 export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-512-v4"
 
-accelerate launch train_text_to_image_lora.py \
+accelerate launch ../train_text_to_image_lora.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --dataset_name=$DATASET_NAME --caption_column="text" \
   --resolution=512 --random_flip \

@@ -2,7 +2,7 @@
 export MODEL_NAME="stable-diffusion-v1-5/stable-diffusion-v1-5"
 export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-512-v4"
 
-accelerate launch train_text_to_image_lora.py \
+accelerate launch ../train_text_to_image_lora.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --pretrained_vae_model_name_or_path="stabilityai/sd-vae-ft-mse" \
   --dataset_name=$DATASET_NAME --caption_column="text" \
@@ -15,7 +15,9 @@ accelerate launch train_text_to_image_lora.py \
   --lr_scheduler="cosine" \
   --lr_warmup_steps=100 \
   --mixed_precision="fp16" \
+  --rank=32 --lora_alpha=16 \
+  --snr_gamma=5.0 \
   --seed=42 \
-  --output_dir="pixel-art-lora-v4" \
+  --output_dir="pixel-art-lora-v3" \
   --validation_prompt="house, tongue, dq_pookie" \
   --report_to="wandb"

@@ -134,11 +134,21 @@ def log_validation(
     else:
         autocast_ctx = torch.autocast(accelerator.device.type)
 
+    validation_resolution = (
+        args.validation_resolution
+        if args.validation_resolution is not None
+        else args.resolution
+    )
+
     with autocast_ctx:
         for _ in range(args.num_validation_images):
             images.append(
                 pipeline(
-                    args.validation_prompt, num_inference_steps=30, generator=generator
+                    args.validation_prompt,
+                    num_inference_steps=30,
+                    generator=generator,
+                    width=validation_resolution,
+                    height=validation_resolution,
                 ).images[0]
             )
 
@@ -239,6 +249,12 @@ def parse_args():
             "Run fine-tuning validation every X epochs. The validation process consists of running the prompt"
             " `args.validation_prompt` multiple times: `args.num_validation_images`."
         ),
+    )
+    parser.add_argument(
+        "--validation_resolution",
+        type=int,
+        default=None,
+        help="The resolution for validation images. If not specified, uses the training resolution.",
     )
     parser.add_argument(
         "--max_train_samples",
