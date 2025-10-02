@@ -17,3 +17,4 @@ data/cleaned_sprites_good
 training/wandb
 output/
 models/*
+output_dq/*
