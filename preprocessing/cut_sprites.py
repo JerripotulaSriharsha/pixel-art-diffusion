@@ -284,7 +284,7 @@ def main():
     # Hardcoded arguments - modify these values as needed
     class Args:
         def __init__(self):
-            self.input = "data/raw_spritesheets/"  # Input file or folder path
+            self.input = "output_dq/pookie-pixel-lora-sdxl-1759431722-3.png"  # Input file or folder path
             self.out = "data/test"  # Output directory
             self.tol = 10.0  # Color distance tolerance vs. background
             self.min_size = 10  # Minimum bbox width/height
@@ -296,7 +296,7 @@ def main():
 
             # Background replacement settings
             self.replace_bg = True
-            self.new_bg_color = (255, 0, 255)  # New background color (R, G, B)
+            self.new_bg_color = (255, 255, 255)  # New background color (R, G, B)
 
             # Final export padding (uniform border on the *output canvas*, in output pixels)
             self.pad_px_64 = 1

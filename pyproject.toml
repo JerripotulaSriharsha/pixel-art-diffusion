@@ -23,5 +23,6 @@ dependencies = [
     "ftfy",
     "tensorboard",
     "Jinja2",
-    "peft==0.17.0"
+    "peft==0.17.0",
+    "scipy>=1.15.3",
 ]
