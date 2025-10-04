@@ -75,10 +75,10 @@ generate_images(
     inference_height=512,
     inference_width=512,
     output_dir="output_dq",
-    num_images=4,
+    num_images=1,
     image_upscale_factor=1,
-    steps=50,
+    steps=30,
     guidance=7.5,
-    device="cuda",
+    device="mps",
     vae_path="madebyollin/sdxl-vae-fp16-fix",
 )
