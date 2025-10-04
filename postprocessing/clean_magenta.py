@@ -91,14 +91,14 @@ def remove_magenta_bleed(
 
 
 if __name__ == "__main__":
-    img = Image.open("output_postprocessing/pixelized.png_8_upscaled.png")
+    img = Image.open("output_postprocessing/pixelized.png_16_upscaled.png")
     cleaned = remove_magenta_bleed(
         img,
-        bg_color=(255, 0, 255),
-        key_lo=45,
-        key_hi=200,
-        open_iters=1,
-        close_iters=1,
-        green_spill_strength=1,
+        # bg_color=(255, 0, 255),
+        # key_lo=45,
+        # key_hi=200,
+        # open_iters=1,
+        # close_iters=1,
+        # green_spill_strength=1,
     )
-    cleaned.save("output_postprocessing/clean.png_8_upscaled.png")
+    cleaned.save("output_postprocessing/clean.png_16_upscaled.png")
