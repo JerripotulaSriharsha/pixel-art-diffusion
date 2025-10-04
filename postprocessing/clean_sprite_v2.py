@@ -12,7 +12,7 @@ import scipy
 from itertools import product
 
 
-def kCentroid(image: Image, width: int, height: int, centroids: int):
+def _kCentroid(image: Image, width: int, height: int, centroids: int):
     image = image.convert("RGB")
 
     # Create an empty array for the downscaled image
@@ -41,10 +41,10 @@ def kCentroid(image: Image, width: int, height: int, centroids: int):
         # Assign the most common color to the corresponding pixel in the downscaled image
         downscaled[y, x, :] = most_common_color
 
-    return Image.fromarray(downscaled, mode="RGB")
+    return Image.fromarray(downscaled)
 
 
-def pixelate(image: Image):
+def _pixelate(image: Image):
     # Convert the image to a NumPy array
     npim = np.array(image)[..., :3]
 
@@ -65,7 +65,7 @@ def pixelate(image: Image):
     vspacing = np.diff(vpeaks)
 
     # Resize input image using kCentroid with the calculated horizontal and vertical factors
-    return kCentroid(
+    return _kCentroid(
         image,
         round(image.width / np.median(hspacing)),
         round(image.height / np.median(vspacing)),
@@ -73,7 +73,7 @@ def pixelate(image: Image):
     )
 
 
-def determine_best_k(image: Image, max_k: int):
+def _determine_best_k(image: Image, max_k: int):
     # Convert the image to RGB mode
     image = image.convert("RGB")
 
@@ -105,14 +105,14 @@ def determine_best_k(image: Image, max_k: int):
     return best_k
 
 
-def reduce_palette(image: Image, max_colors: int):
-    best_k = determine_best_k(image, max_colors)
+def _reduce_palette(image: Image, max_colors: int):
+    best_k = _determine_best_k(image, max_colors)
     return image.quantize(colors=best_k, method=1, kmeans=best_k, dither=0).convert(
         "RGB"
     )
 
 
-def detect_background_color(arr: np.ndarray):
+def _detect_background_color(arr: np.ndarray):
     """Pick the most likely background color using corners + sparse grid sample."""
     H, W, _ = arr.shape
     samples = []
@@ -141,7 +141,7 @@ def detect_background_color(arr: np.ndarray):
     return Counter(samples).most_common(1)[0][0]  # (r,g,b)
 
 
-def color_distance_map(arr: np.ndarray, bg: tuple):
+def _color_distance_map(arr: np.ndarray, bg: tuple):
     """Euclidean distance in RGB to background color."""
     bg_vec = np.array(bg, dtype=np.float32)[None, None, :]
     arrf = arr.astype(np.float32)
@@ -150,7 +150,7 @@ def color_distance_map(arr: np.ndarray, bg: tuple):
     return dist
 
 
-def crop_with_margin(box, W, H, margin):
+def _crop_with_margin(box, W, H, margin):
     xmin, ymin, xmax, ymax = box
     return (
         max(0, xmin - margin),
@@ -160,7 +160,7 @@ def crop_with_margin(box, W, H, margin):
     )
 
 
-def largest_component_mask(mask: np.ndarray):
+def _largest_component_mask(mask: np.ndarray):
     """
     Return (comp_mask, bbox, count) for the largest 4-neighborhood connected component in `mask`.
     comp_mask has the same shape as mask (bool).
@@ -213,7 +213,7 @@ def largest_component_mask(mask: np.ndarray):
     return comp_mask, best_bbox, best_count
 
 
-def make_alpha_from_distance(dist: np.ndarray, tol: float, feather: float):
+def _make_alpha_from_distance(dist: np.ndarray, tol: float, feather: float):
     """
     Turn color distance into alpha. Pixels near the bg color get alpha 0,
     pixels clearly different get alpha 255. `feather` softens the edge in distance units.
@@ -226,7 +226,7 @@ def make_alpha_from_distance(dist: np.ndarray, tol: float, feather: float):
     return (a * 255).astype(np.uint8)
 
 
-def erode_mask(mask: np.ndarray, iterations: int = 1):
+def _erode_mask(mask: np.ndarray, iterations: int = 1):
     """
     Simple binary erosion (shrink foreground by N pixels).
     Uses 4-neighborhood (cross kernel).
@@ -254,7 +254,7 @@ def erode_mask(mask: np.ndarray, iterations: int = 1):
     return result
 
 
-def remove_background(
+def _remove_background(
     image: Image.Image,
     bg_color=None,  # specific background color (r,g,b) or None to auto-detect
     tol=50,  # color distance tolerance vs. background
@@ -270,8 +270,8 @@ def remove_background(
     if bg_color is not None:
         bg = tuple(bg_color)
     else:
-        bg = detect_background_color(rgb)
-    dist = color_distance_map(rgb, bg)
+        bg = _detect_background_color(rgb)
+    dist = _color_distance_map(rgb, bg)
 
     if tol is None:
         # For known bg colors (especially magenta), use higher tolerance
@@ -286,7 +286,7 @@ def remove_background(
     fg_mask = dist > tol
 
     # 3) Largest connected component (the sprite)
-    comp_mask_full, bbox, count = largest_component_mask(fg_mask)
+    comp_mask_full, bbox, count = _largest_component_mask(fg_mask)
     if comp_mask_full is None:
         raise ValueError(
             "No sprite-like component found. Try lowering `tol` or thresholds."
@@ -294,7 +294,7 @@ def remove_background(
 
     # 4) Crop with margin
     xmin, ymin, xmax, ymax = bbox
-    xmin2, ymin2, xmax2, ymax2 = crop_with_margin(
+    xmin2, ymin2, xmax2, ymax2 = _crop_with_margin(
         (xmin, ymin, xmax, ymax), W, H, margin
     )
 
@@ -304,22 +304,22 @@ def remove_background(
     mask_crop = fg_mask[ymin2 : ymax2 + 1, xmin2 : xmax2 + 1]
 
     # 5) Within the crop, re-isolate the largest component to be safe
-    comp_mask_crop, _, _ = largest_component_mask(mask_crop)
+    comp_mask_crop, _, _ = _largest_component_mask(mask_crop)
     if comp_mask_crop is None:
         # fallback: use the original fg mask within crop
         comp_mask_crop = mask_crop
 
     # 5b) Optionally erode the mask to remove edge artifacts
     if expand_mask > 0:
-        comp_mask_crop = erode_mask(comp_mask_crop, iterations=expand_mask)
+        comp_mask_crop = _erode_mask(comp_mask_crop, iterations=expand_mask)
 
     # 6) Build alpha: feathered by distance, but only keep the chosen component
-    alpha_soft = make_alpha_from_distance(dist_crop, tol=tol, feather=feather)
+    alpha_soft = _make_alpha_from_distance(dist_crop, tol=tol, feather=feather)
     alpha = alpha_soft * comp_mask_crop.astype(np.uint8)
 
     # 7) Compose RGBA with transparent background
     rgba = np.dstack([rgb_crop, alpha]).astype(np.uint8)
-    out_img = Image.fromarray(rgba, mode="RGBA")
+    out_img = Image.fromarray(rgba)
 
     return out_img
 
@@ -353,13 +353,13 @@ def clean_image(
     image = Image.open(input_path).convert("RGB")
 
     # Pixelate the image
-    pixelated = pixelate(image)
+    pixelated = _pixelate(image)
 
     # Reduce the color palette
-    reduced_palette = reduce_palette(pixelated, max_colors)
+    reduced_palette = _reduce_palette(pixelated, max_colors)
 
     # Remove the magenta background
-    cleaned = remove_background(
+    cleaned = _remove_background(
         reduced_palette, tol=tol, margin=margin, expand_mask=expand_mask
     )
 
