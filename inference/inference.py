@@ -5,26 +5,25 @@ import os
 from PIL import Image
 from postprocessing.clean_sprite import clean
 
+"""Script to generate images using my trained pixel monsters lora."""
+
 
 def generate_images(
-    base_model: str,
-    lora_path: str,
     prompt: str,
-    inference_height: int,
-    inference_width: int,
     output_dir: str,
     num_images: int,
     steps: int,
     guidance: float,
     device: str,
+    base_model: str = "stabilityai/stable-diffusion-xl-base-1.0",
+    lora_path: str = "pookie3000/pixel-monsters-lora-sdxl",
+    inference_height: int = 512,
+    inference_width: int = 512,
     clean_sprite: bool = True,
     image_upscale_factor: int = 1,
     vae_path: str = None,
     negative_prompt: str = None,
 ):
-    """Generate images using a Stable Diffusion pipeline with LoRA weights."""
-
-    # Load pipeline and inject VAE
     pipe = DiffusionPipeline.from_pretrained(
         base_model,
         torch_dtype=torch.float16,
@@ -33,11 +32,7 @@ def generate_images(
         vae = AutoencoderKL.from_pretrained(vae_path, torch_dtype=torch.float16)
         pipe.vae = vae
     pipe.to(device)
-
-    # Load LoRA weights
     pipe.load_lora_weights(lora_path)
-
-    # Generate images
     os.makedirs(output_dir, exist_ok=True)
     images = pipe(
         prompt,
@@ -71,16 +66,13 @@ def generate_images(
 
 
 generate_images(
-    base_model="stabilityai/stable-diffusion-xl-base-1.0",
-    lora_path="pookie3000/pixel-monsters-lora-sdxl",
-    prompt="ghost, scary, dq_pookie",
-    # negative_prompt="blurry",
-    inference_height=512,
-    inference_width=512,
+    prompt="taxi, dq_pookie",  # specify keywords with comma separation, last keyword is always "dq_pookie"
+    # negative_prompt="",
     output_dir="output",
-    num_images=8,
-    steps=30,
+    num_images=40,
+    steps=50,
     guidance=7.5,
     device="cuda",
     vae_path="madebyollin/sdxl-vae-fp16-fix",
+    clean_sprite=False,
 )

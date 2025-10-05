@@ -372,9 +372,9 @@ def clean(
 
 
 if __name__ == "__main__":
-    input_dir = "output_dq"
-    output_dir = "output_dq_cleaned_v2"
-    max_colors = 16
+    input_dir = "sample_outputs"
+    output_dir = "sample_outputs_cleaned"
+    max_colors = 50
     tol = 70
     margin = 5
     expand_mask = 1
