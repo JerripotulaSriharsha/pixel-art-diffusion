@@ -3,6 +3,7 @@ import torch
 import time
 import os
 from PIL import Image
+from postprocessing.clean_sprite import clean
 
 
 def generate_images(
@@ -16,6 +17,7 @@ def generate_images(
     steps: int,
     guidance: float,
     device: str,
+    clean_sprite: bool = True,
     image_upscale_factor: int = 1,
     vae_path: str = None,
     negative_prompt: str = None,
@@ -48,7 +50,6 @@ def generate_images(
         safety_checker=None,
     ).images
 
-    # Save with timestamp
     timestamp = int(time.time())
     for i, img in enumerate(images):
         img = img.resize(
@@ -62,6 +63,8 @@ def generate_images(
             output_dir, f"{os.path.basename(lora_path)}-{timestamp}-{i}.png"
         )
         img.save(filename)
+        if clean_sprite:
+            clean(filename, filename.replace(".png", "_clean.png"))
         print(f"Saved {filename}")
 
     return images
@@ -69,16 +72,15 @@ def generate_images(
 
 generate_images(
     base_model="stabilityai/stable-diffusion-xl-base-1.0",
-    lora_path="pookie3000/pookie-pixel-lora-sdxl",
+    lora_path="pookie3000/pixel-monsters-lora-sdxl",
     prompt="ghost, scary, dq_pookie",
     # negative_prompt="blurry",
     inference_height=512,
     inference_width=512,
-    output_dir="output_dq",
-    num_images=1,
-    image_upscale_factor=1,
+    output_dir="output",
+    num_images=8,
     steps=30,
     guidance=7.5,
-    device="mps",
+    device="cuda",
     vae_path="madebyollin/sdxl-vae-fp16-fix",
 )

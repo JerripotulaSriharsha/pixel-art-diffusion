@@ -324,13 +324,13 @@ def _remove_background(
     return out_img
 
 
-def clean_image(
+def clean(
     input_path: str,
     output_path: str,
     max_colors: int = 16,
-    tol: float = 50,
+    tol: float = 70,
     margin: int = 5,
-    expand_mask: int = 0,
+    expand_mask: int = 1,
 ):
     """
     Pixelate, reduce color palette and remove background.
@@ -382,7 +382,7 @@ if __name__ == "__main__":
         if file.endswith(".png"):
             input_image_path = os.path.join(input_dir, file)
             output_image_path = os.path.join(output_dir, file)
-            clean_image(
+            clean(
                 input_image_path,
                 output_image_path,
                 max_colors,

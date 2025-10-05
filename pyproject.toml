@@ -26,3 +26,10 @@ dependencies = [
     "peft==0.17.0",
     "scipy>=1.15.3",
 ]
+
+[tool.setuptools]
+packages = ["preprocessing", "postprocessing", "inference", "training", "lora_conversion"]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
