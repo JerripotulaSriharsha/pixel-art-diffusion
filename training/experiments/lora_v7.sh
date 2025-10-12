@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export MODEL_NAME="stable-diffusion-v1-5/stable-diffusion-v1-5"
-export DATASET_NAME="pookie3000/pixel-art-finetune-dataset-512-v4"
+export DATASET_NAME="pookie3000/pookie-pixel-512"
 
 accelerate launch ../train_text_to_image_lora.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
@@ -15,5 +15,5 @@ accelerate launch ../train_text_to_image_lora.py \
   --mixed_precision="fp16" \
   --seed=42 \
   --rank=8 \
-  --output_dir="pixel-art-lora-v7" \
+  --output_dir="pixel-art-lora" \
   --validation_prompt="robot, dq_pookie" --report_to="wandb" \
