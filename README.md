@@ -12,12 +12,6 @@ Prompt: `jelly, monster, dq_pookie`
 
 For more examples, check `data/sample_outputs/`.
 
-## Final Models and Dataset
-
-- [Pixel Monsters LoRA](https://huggingface.co/pookie3000/pixel-monsters-lora-sdxl)
-- [Pixel Monsters Dataset](https://huggingface.co/datasets/pookie3000/pookie-pixel-512)
-
-Check data/sample_outputs for more examples of generated sprites.
 
 ## Project Structure
 
